@@ -3,13 +3,31 @@ import { createStore } from 'redux'
 
 let ticTacToe = Map();
 
-function winner(){
-
+function winner(board){
+  const coordArr = [
+    [[0,0], [0,1], [0,2]],
+    [[1,0], [1,1], [1,2]],
+    [[2,0], [2,1], [2,2]],
+    [[0,0], [1,0], [2,0]],
+    [[0,1], [1,1], [2,1]],
+    [[0,2], [1,2], [2,2]],
+    [[0,0], [1,1], [2,2]],
+    [[2,0], [1,1], [0,2]]
+  ]
+  for(let x = 0; x < coordArr.length; x++) {
+    if(streak(board, ...coordArr[x])) return streak(board, ...coordArr[x])
+  }
+  for(let i = 0; i < 3; i++) {
+    for(let j = 0; j < 3; j++) {
+      if(!board.getIn([i,j])) return null
+    }
+  }
+  return 'draw'
 }
 
 function streak(board,...coords){
   let coordStatus = {}
-  for(let i=0;i<coords.length;i++){
+  for(let i = 0; i < coords.length; i++){
     let coord = board.getIn(coords[i]);
     if(coord === undefined)
       return
@@ -18,19 +36,12 @@ function streak(board,...coords){
     else
       coordStatus[coord] = 1
   }
-  console.log(coordStatus);
   if(coordStatus['X'] === 3)
     return 'X'
   else if(coordStatus['O'] === 3)
     return 'O'
   else
     return
-  // let coordStatus;
-  // return coords.reduce((result,coord) => {
-  //   console.log('Reduce ran', board.getIn(coord));
-  //   if(!board.getIn(coord)) return
-  //   coordStatus = boar
-  // })
 }
 
 const initialState = {
@@ -38,13 +49,11 @@ const initialState = {
   turn: 'X'
 }
 
-//console.log(ticTacToe);
-
 export default function reducer(state=initialState, action) {
   if(action.type === 'MOVE') {
     const nextTurn = state.turn === 'X' ? 'O' : 'X'
     const newBoard = state.board.setIn(action.position, state.turn);
-    console.log(streak(newBoard,[0,0],[0,1],[0,2]));
+    console.log(winner(newBoard));
     return {
       board: newBoard,
       turn: nextTurn
