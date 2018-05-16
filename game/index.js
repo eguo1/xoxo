@@ -65,6 +65,10 @@ const boardReducer = (board=Map(), action) => {
 }
 
 export default function reducer(state={}, action) {
+  if(bad(state, action)) {
+    console.log(bad(state, action))
+    return state;
+  }
   const nextTurn = turnReducer(state.turn, action)
   const newBoard = boardReducer(state.board, action);
   const winnerState = winner(newBoard);
@@ -82,6 +86,21 @@ export const move = (player, position) => ({
   player
 })
 
-
-
+function bad(state, action) {
+  if(action.type !== 'MOVE') {
+    return null
+  }
+  if(action.player !== state.turn) {
+    return "It's not your turn!"
+  }
+  if(
+    action.position[0] < 0 && action.position[0] > 2 && 
+    action.position[1] < 0 && action.position[1] > 2) {
+      return 'Position is invalid!'
+    }
+  if(state.board.getIn(action.position)) {
+    return 'The square is already taken!'
+  }
+  return null
+}
 
