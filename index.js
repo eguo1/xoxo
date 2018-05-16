@@ -14,7 +14,7 @@ const printBoard = () => {
 }
 
 const getInput = player => async () => {
-  const {turn} = game.getState()  
+  const {turn} = game.getState()
   if (turn !== player) return
   const ans = await inquirer.prompt([{
     type: 'input',
@@ -25,13 +25,24 @@ const getInput = player => async () => {
   game.dispatch(move(turn, [row, col]))
 }
 
+
 // Create the store
 const game = createStore(gameReducer)
 
 // Debug: Print the state
 // game.subscribe(() => console.log(game.getState()))
-
 game.subscribe(printBoard)
+game.subscribe(() => {
+  if(game.getState().winner){
+    if(game.getState().winner === 'draw'){
+      console.log('Its a draw!!')
+    }
+    else {
+      console.log(game.getState().winner + ' Wins');
+    }
+    process.exit(0);
+  }
+})
 game.subscribe(getInput('X'))
 game.subscribe(getInput('O'))
 

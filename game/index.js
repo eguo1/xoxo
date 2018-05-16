@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 import { createStore } from 'redux'
 
-let ticTacToe = Map();
+//let ticTacToe = Map();
 
 function winner(board){
   const coordArr = [
@@ -45,21 +45,34 @@ function streak(board,...coords){
 }
 
 const initialState = {
-  board: ticTacToe,
+  board: Map(),
   turn: 'X'
 }
 
-export default function reducer(state=initialState, action) {
+const turnReducer = (turn='X',action) => {
   if(action.type === 'MOVE') {
-    const nextTurn = state.turn === 'X' ? 'O' : 'X'
-    const newBoard = state.board.setIn(action.position, state.turn);
-    console.log(winner(newBoard));
-    return {
-      board: newBoard,
-      turn: nextTurn
-    }
+    return turn === 'X' ? 'O' : 'X'
   }
-  return state
+  return turn;
+}
+
+const boardReducer = (board=Map(), action) => {
+  if(action.type === 'MOVE') {
+    const newBoard = board.setIn(action.position, action.player);
+    return newBoard
+  }
+  return board;
+}
+
+export default function reducer(state={}, action) {
+  const nextTurn = turnReducer(state.turn, action)
+  const newBoard = boardReducer(state.board, action);
+  const winnerState = winner(newBoard);
+  return {
+    board: newBoard,
+    turn: nextTurn,
+    winner: winnerState
+  }
 }
 
 //ACTION TYPES
