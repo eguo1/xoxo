@@ -33,12 +33,13 @@ const game = createStore(gameReducer)
 // game.subscribe(() => console.log(game.getState()))
 game.subscribe(printBoard)
 game.subscribe(() => {
-  if(game.getState().winner){
-    if(game.getState().winner === 'draw'){
+  const winner = game.getState().winner
+  if(winner){
+    if(winner === 'draw'){
       console.log('Its a draw!!')
     }
     else {
-      console.log(game.getState().winner + ' Wins');
+      console.log(winner + ' Wins');
     }
     process.exit(0);
   }

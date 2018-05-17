@@ -1,7 +1,4 @@
 import { Map } from 'immutable';
-import { createStore } from 'redux'
-
-//let ticTacToe = Map();
 
 function winner(board){
   const coordArr = [
@@ -25,38 +22,23 @@ function winner(board){
   return 'draw'
 }
 
-function streak(board,...coords){
-  let coordStatus = {}
-  for(let i = 0; i < coords.length; i++){
-    let coord = board.getIn(coords[i]);
-    if(coord === undefined)
-      return
-    if(Object.keys(coordStatus).includes(coord))
-      coordStatus[coord] += 1;
-    else
-      coordStatus[coord] = 1
+function streak(board, first, ...coords){
+  const player = board.getIn(first)
+  if (!player) return null
+  for (let coord of coords) {
+    if (board.getIn(coord) !== player) return null
   }
-  if(coordStatus['X'] === 3)
-    return 'X'
-  else if(coordStatus['O'] === 3)
-    return 'O'
-  else
-    return
+  return player
 }
 
-const initialState = {
-  board: Map(),
-  turn: 'X'
-}
-
-const turnReducer = (turn='X',action) => {
+const turnReducer = (turn = 'X', action) => {
   if(action.type === 'MOVE') {
     return turn === 'X' ? 'O' : 'X'
   }
   return turn;
 }
 
-const boardReducer = (board=Map(), action) => {
+const boardReducer = (board = Map(), action) => {
   if(action.type === 'MOVE') {
     const newBoard = board.setIn(action.position, action.player);
     return newBoard
@@ -64,7 +46,7 @@ const boardReducer = (board=Map(), action) => {
   return board;
 }
 
-export default function reducer(state={}, action) {
+export default function reducer(state = {}, action) {
   if(bad(state, action)) {
     console.log(bad(state, action))
     return state;
@@ -94,10 +76,10 @@ function bad(state, action) {
     return "It's not your turn!"
   }
   if(
-    action.position[0] < 0 && action.position[0] > 2 && 
-    action.position[1] < 0 && action.position[1] > 2) {
-      return 'Position is invalid!'
-    }
+    action.position[0] < 0 || action.position[0] > 2 || 
+    action.position[1] < 0 || action.position[1] > 2 ||
+    Number.isNaN(action.position[0]) || Number.isNaN(action.position[1])
+    ) return 'Position is invalid!'
   if(state.board.getIn(action.position)) {
     return 'The square is already taken!'
   }
